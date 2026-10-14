@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="110" fill="#151515"/>
+  <rect x="70" y="150" width="372" height="90" rx="40" fill="#222"/>
+  <rect x="86" y="164" width="160" height="62" rx="28" fill="#ff2a2a"/>
+  <rect x="266" y="164" width="160" height="62" rx="28" fill="#2a6bff"/>
+  <circle cx="256" cy="350" r="78" fill="#c62020" stroke="#e7c430" stroke-width="14"/>
+  <text x="256" y="366" font-family="Arial, sans-serif" font-weight="900" font-size="44" fill="#fff" text-anchor="middle">СГУ</text>
+</svg>

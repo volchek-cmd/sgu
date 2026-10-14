@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#111111">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="СГУ Пульт">
+  <title>СГУ Пульт</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon-180.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-skin="classic">
+  <div class="app">
+    <header class="top">
+      <div class="skins" role="tablist" aria-label="Вид пульта">
+        <button data-skin="classic" class="skin-btn">Классик</button>
+        <button data-skin="neon" class="skin-btn">Неон</button>
+        <button data-skin="retro" class="skin-btn">Ретро</button>
+      </div>
+    </header>
+
+    <div class="lightbar" id="lightbar" aria-hidden="true">
+      <i class="lamp r"></i><i class="lamp r"></i><i class="lamp r"></i><i class="bar-mid"></i><i class="lamp b"></i><i class="lamp b"></i><i class="lamp b"></i>
+    </div>
+
+    <main class="panel">
+      <div class="screw tl"></div><div class="screw tr"></div><div class="screw bl"></div><div class="screw br"></div>
+
+      <div class="plate">
+        <span class="plate-name">СГУ‑200</span>
+        <span class="plate-sub">сигнально‑громкоговорящее устройство</span>
+      </div>
+
+      <div class="display">
+        <div class="d-row">
+          <span class="d-pwr" id="dPwr">●</span>
+          <span class="d-mode" id="dMode">ГОТОВ</span>
+        </div>
+        <div class="d-row">
+          <span class="d-freq"><span id="dFreq">----</span><small> Гц</small></span>
+          <span class="meter"><i id="dMeter"></i></span>
+        </div>
+      </div>
+
+      <div class="horn-style" role="radiogroup" aria-label="Блок СГУ">
+        <button data-prof="rf">РФ ТИПОВОЙ</button>
+        <button data-prof="pa300">FEDERAL PA300</button>
+        <button data-prof="p7007">PREMIER 7007</button>
+      </div>
+
+      <section class="modes" aria-label="Тоны сирены">
+        <button class="key mode" data-mode="wail"><span class="led"></span><span class="lever"></span><b>ВОЛНА</b><small>WAIL</small></button>
+        <button class="key mode" data-mode="yelp"><span class="led"></span><span class="lever"></span><b>ТРЕЛЬ</b><small>YELP</small></button>
+        <button class="key mode" data-mode="piu"><span class="led"></span><span class="lever"></span><b>ПИУ</b><small>PIERCER</small></button>
+        <button class="key mode" data-mode="phaser"><span class="led"></span><span class="lever"></span><b>ФАЗЕР</b><small>PULSAR</small></button>
+        <button class="key mode" data-mode="hilo"><span class="led"></span><span class="lever"></span><b>ДВУХТОН</b><small>HI‑LO</small></button>
+        <button class="key mode" data-mode="mech"><span class="led"></span><span class="lever"></span><b>МЕХ</b><small>СО‑120</small></button>
+      </section>
+
+      <section class="holds">
+        <button class="key hold manual" data-hold="manual"><span class="led"></span><b>РУЧНОЙ</b><small>MANUAL</small></button>
+        <button class="key hold off" id="btnOff"><span class="led"></span><b>СТОП</b><small>OFF</small></button>
+      </section>
+
+      <button class="key hold horn" data-hold="horn" aria-label="Кряк — держите">
+        <span class="horn-ring"></span>
+        <b>КРЯК</b><small>держи</small>
+      </button>
+
+      <div class="horn-style" role="radiogroup" aria-label="Тип кряка">
+        <button data-style="kryak">КРЯК</button>
+        <button data-style="series">КРЯ‑КРЯ</button>
+        <button data-style="air">ГУДОК</button>
+      </div>
+
+      <div class="horn-style" role="radiogroup" aria-label="Акустика">
+        <button data-acou="near">БЛИЗКО</button>
+        <button data-acou="street">УЛИЦА</button>
+        <button data-acou="far">ДАЛЕКО</button>
+      </div>
+
+      <label class="volume">
+        <span>ГРОМК.</span>
+        <input type="range" id="vol" min="0" max="100" value="80">
+      </label>
+    </main>
+
+    <footer class="foot">Звук синтезируется кодом на вашем устройстве · без файлов</footer>
+  </div>
+
+  <script src="engine.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

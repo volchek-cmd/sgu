@@ -1,0 +1,222 @@
+/* ===== База ===== */
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; margin: 0; }
+body {
+  font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  overscroll-behavior: none;
+  transition: background .3s;
+}
+button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; }
+
+.app {
+  max-width: 460px; margin: 0 auto; min-height: 100%;
+  padding: calc(env(safe-area-inset-top) + 10px) 14px calc(env(safe-area-inset-bottom) + 12px);
+  display: flex; flex-direction: column; gap: 12px;
+}
+
+/* Переключатель вида */
+.skins { display: flex; gap: 6px; justify-content: center; }
+.skin-btn {
+  padding: 6px 14px; border-radius: 999px; font-size: 13px; letter-spacing: .03em;
+  background: var(--chip); color: var(--chip-ink); opacity: .75;
+}
+.skin-btn.active { opacity: 1; background: var(--chip-on); color: var(--chip-on-ink); }
+
+/* Мигалка */
+.lightbar {
+  display: flex; gap: 4px; height: 26px; padding: 4px; border-radius: 14px;
+  background: linear-gradient(#2a2a2a, #0d0d0d); box-shadow: inset 0 1px 0 #444, 0 2px 6px #0008;
+}
+.lightbar .lamp { flex: 1; border-radius: 6px; background: #3a1010; }
+.lightbar .lamp.b { background: #10183a; }
+.lightbar .bar-mid { width: 30px; border-radius: 6px; background: #222; }
+.lightbar.on .lamp.r { animation: flashR .5s steps(1) infinite; }
+.lightbar.on .lamp.b { animation: flashB .5s steps(1) infinite; }
+.lightbar.on .lamp:nth-child(2), .lightbar.on .lamp:nth-child(6) { animation-delay: .08s; }
+@keyframes flashR { 0%, 20%, 40% { background: #ff2a2a; box-shadow: 0 0 18px #ff2a2a; } 10%, 30%, 50%, 100% { background: #3a1010; box-shadow: none; } }
+@keyframes flashB { 50%, 70%, 90% { background: #2a6bff; box-shadow: 0 0 18px #2a6bff; } 0%, 60%, 80%, 100% { background: #10183a; box-shadow: none; } }
+
+/* Корпус */
+.panel {
+  position: relative; flex: 1;
+  display: flex; flex-direction: column; gap: 14px;
+  padding: 18px 16px 20px; border-radius: var(--panel-r);
+  background: var(--panel); box-shadow: var(--panel-shadow);
+}
+.screw { display: none; position: absolute; width: 14px; height: 14px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ddd, #777 60%, #444);
+}
+.screw::after { content: ""; position: absolute; left: 2px; right: 2px; top: 6px; height: 2px; background: #333; transform: rotate(35deg); }
+.screw.tl { top: 8px; left: 8px; } .screw.tr { top: 8px; right: 8px; }
+.screw.bl { bottom: 8px; left: 8px; } .screw.br { bottom: 8px; right: 8px; }
+
+.plate { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.plate-name { font-weight: 800; letter-spacing: .18em; font-size: 15px; color: var(--plate-ink); }
+.plate-sub { font-size: 10px; letter-spacing: .08em; text-transform: uppercase; opacity: .55; }
+
+/* Дисплей */
+.display {
+  padding: 10px 14px; border-radius: var(--disp-r);
+  background: var(--disp-bg); color: var(--disp-ink);
+  font-family: "Courier New", ui-monospace, monospace; box-shadow: var(--disp-shadow);
+  text-shadow: 0 0 8px var(--disp-glow);
+}
+.d-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.d-mode { font-size: 22px; font-weight: 700; letter-spacing: .08em; }
+.d-pwr { font-size: 12px; opacity: .4; }
+body.live .d-pwr { opacity: 1; color: #ff3b3b; text-shadow: 0 0 8px #ff3b3b; }
+.d-freq { font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.d-freq small { font-size: 13px; opacity: .7; }
+.meter { flex: 1; max-width: 140px; height: 10px; border-radius: 3px; background: var(--meter-bg); overflow: hidden; }
+.meter i { display: block; height: 100%; width: 100%; transform-origin: left; transform: scaleX(0);
+  background: var(--meter); transition: transform .05s linear; }
+
+/* Клавиши */
+.key {
+  position: relative; touch-action: none;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  min-height: 64px; padding: 10px 6px; border-radius: var(--key-r);
+  background: var(--key); color: var(--key-ink); box-shadow: var(--key-shadow);
+  transition: transform .06s, box-shadow .06s, background .15s;
+}
+.key b { font-size: 15px; letter-spacing: .05em; }
+.key small { font-size: 10px; letter-spacing: .1em; opacity: .55; }
+.key:active, .key.pressed { transform: translateY(2px); box-shadow: var(--key-shadow-down); }
+.key .led {
+  position: absolute; top: 8px; left: 8px; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--led-off); box-shadow: inset 0 1px 2px #0008;
+}
+.key.active .led, .key.pressed .led { background: var(--led); box-shadow: 0 0 8px var(--led), 0 0 2px #fff inset; }
+.key.active { background: var(--key-on, var(--key)); color: var(--key-on-ink, var(--key-ink)); }
+.key .lever { display: none; }
+
+.modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.holds { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.holds .key { min-height: 54px; }
+
+.key.horn {
+  min-height: 132px; border-radius: var(--horn-r);
+  background: var(--horn); color: var(--horn-ink); box-shadow: var(--horn-shadow);
+}
+.key.horn b { font-size: 34px; letter-spacing: .12em; }
+.key.horn small { font-size: 11px; text-transform: uppercase; }
+.key.horn.pressed { background: var(--horn-on, var(--horn)); box-shadow: var(--horn-shadow-down); }
+.horn-ring { display: none; }
+
+.horn-style { display: flex; gap: 6px; background: var(--seg-bg); padding: 4px; border-radius: 10px; }
+.horn-style button { flex: 1; padding: 8px 4px; border-radius: 7px; font-size: 12px; font-weight: 700; letter-spacing: .05em; opacity: .6; }
+.horn-style button.active { background: var(--seg-on); color: var(--seg-on-ink); opacity: 1; }
+
+.volume { display: flex; align-items: center; gap: 12px; font-size: 11px; font-weight: 700; letter-spacing: .1em; opacity: .85; }
+.volume input { flex: 1; accent-color: var(--accent); height: 28px; }
+
+.foot { text-align: center; font-size: 11px; opacity: .45; }
+
+/* ===== Скин 1: КЛАССИК — чёрный пластик, резиновые клавиши, янтарный ВЛИ‑дисплей ===== */
+body[data-skin="classic"] {
+  --bg: radial-gradient(circle at 50% 0%, #2b2b2b, #0e0e0e 70%);
+  --ink: #e8e8e8;
+  --chip: #262626; --chip-ink: #bbb; --chip-on: #ff9a1f; --chip-on-ink: #1a1000;
+  --panel: linear-gradient(160deg, #262626, #161616);
+  --panel-r: 18px;
+  --panel-shadow: inset 0 1px 0 #3a3a3a, inset 0 -2px 0 #000, 0 10px 30px #000a;
+  --plate-ink: #d6d6d6;
+  --disp-bg: #120c03; --disp-ink: #ffb02e; --disp-glow: #ff9a1f88; --disp-r: 8px;
+  --disp-shadow: inset 0 2px 10px #000, 0 0 0 2px #2c2c2c, 0 0 0 3px #0a0a0a;
+  --meter-bg: #2a1a05; --meter: linear-gradient(90deg, #ffb02e, #ff5a1f);
+  --key: linear-gradient(#3a3a3a, #262626); --key-ink: #eee; --key-r: 10px;
+  --key-shadow: inset 0 1px 0 #555, 0 3px 0 #0b0b0b, 0 5px 8px #0008;
+  --key-shadow-down: inset 0 1px 0 #444, 0 1px 0 #0b0b0b, 0 2px 4px #0008;
+  --key-on: linear-gradient(#45392a, #2d2519); --key-on-ink: #ffcf7a;
+  --led: #ff9a1f; --led-off: #2a1d0c;
+  --horn: linear-gradient(#c62020, #8a0f0f); --horn-ink: #fff; --horn-r: 16px;
+  --horn-shadow: inset 0 1px 0 #ff6b6b, 0 5px 0 #4a0505, 0 8px 16px #000a;
+  --horn-shadow-down: inset 0 1px 0 #ff6b6b, 0 1px 0 #4a0505, 0 2px 6px #000a;
+  --horn-on: linear-gradient(#ff3030, #b01414);
+  --seg-bg: #111; --seg-on: #ff9a1f; --seg-on-ink: #1a1000;
+  --accent: #ff9a1f;
+}
+
+/* ===== Скин 2: НЕОН — глянцевая сенсорная панель с подсветкой ===== */
+body[data-skin="neon"] {
+  --bg: radial-gradient(circle at 50% -10%, #12233d, #04070d 65%);
+  --ink: #d8ecff;
+  --chip: #0d1726; --chip-ink: #7fa6cc; --chip-on: #29d3ff; --chip-on-ink: #001520;
+  --panel: linear-gradient(180deg, #0b121e, #05080f);
+  --panel-r: 28px;
+  --panel-shadow: 0 0 0 1px #1d2c44, 0 0 40px #0b2a5544, inset 0 1px 0 #ffffff14;
+  --plate-ink: #29d3ff;
+  --disp-bg: linear-gradient(180deg, #0b3a6b, #062140); --disp-ink: #e6f6ff; --disp-glow: #29d3ffaa; --disp-r: 14px;
+  --disp-shadow: inset 0 0 0 1px #2a6db0, inset 0 8px 20px #ffffff10, 0 0 24px #1a6dff33;
+  --meter-bg: #04172c; --meter: linear-gradient(90deg, #29d3ff, #b84dff);
+  --key: #0b1424; --key-ink: #8fb8e0; --key-r: 14px;
+  --key-shadow: 0 0 0 1px #1d3352, inset 0 1px 0 #ffffff10;
+  --key-shadow-down: 0 0 0 1px #29d3ff, 0 0 14px #29d3ff66;
+  --key-on: radial-gradient(circle at 50% 120%, #1a7dff66, #0b1424 70%); --key-on-ink: #fff;
+  --led: #29d3ff; --led-off: #13243a;
+  --horn: radial-gradient(circle at 50% 30%, #3a0a4a, #14051c); --horn-ink: #ff6bf0; --horn-r: 24px;
+  --horn-shadow: 0 0 0 1px #6b1d82, 0 0 24px #b84dff33;
+  --horn-shadow-down: 0 0 0 2px #ff6bf0, 0 0 40px #ff3be0aa, inset 0 0 30px #ff3be055;
+  --horn-on: radial-gradient(circle at 50% 30%, #7a1290, #2a0636);
+  --seg-bg: #08101c; --seg-on: #29d3ff; --seg-on-ink: #001520;
+  --accent: #29d3ff;
+}
+body[data-skin="neon"] .key.active { box-shadow: 0 0 0 1px #29d3ff, 0 0 18px #29d3ff55; }
+body[data-skin="neon"] .key .led { top: auto; bottom: 7px; left: 50%; width: 22px; height: 3px; border-radius: 2px; transform: translateX(-50%); }
+body[data-skin="neon"] .key.horn b { text-shadow: 0 0 14px #ff3be0; }
+
+/* ===== Скин 3: РЕТРО — металлический ящик, тумблеры и «грибок» ===== */
+body[data-skin="retro"] {
+  --bg: repeating-linear-gradient(45deg, #23261c 0 6px, #1f2219 6px 12px);
+  --ink: #e9e4cf;
+  --chip: #3b3f2c; --chip-ink: #c8c2a4; --chip-on: #e9d48a; --chip-on-ink: #2a2610;
+  --panel: linear-gradient(170deg, #6b7051, #4d5239 60%, #444831);
+  --panel-r: 6px;
+  --panel-shadow: inset 0 2px 0 #8a906b, inset 0 -3px 0 #2c2f20, 0 0 0 3px #2c2f20, 0 12px 30px #000b;
+  --plate-ink: #2a2a1c;
+  --disp-bg: #0b1a0b; --disp-ink: #6dff7a; --disp-glow: #3dff5088; --disp-r: 4px;
+  --disp-shadow: inset 0 3px 12px #000, 0 0 0 3px #b9b49a, 0 0 0 5px #2c2f20;
+  --meter-bg: #0e2a10; --meter: repeating-linear-gradient(90deg, #6dff7a 0 6px, transparent 6px 8px);
+  --key: transparent; --key-ink: #f1ecd6; --key-r: 4px;
+  --key-shadow: none; --key-shadow-down: none;
+  --led: #ff3b1f; --led-off: #4a1a12;
+  --horn: radial-gradient(circle at 40% 30%, #ff5a4a, #c4160c 55%, #7a0904); --horn-ink: #fff; --horn-r: 50%;
+  --horn-shadow: 0 0 0 10px #e7c430, 0 0 0 12px #2c2f20, 0 8px 0 12px #2c2f20, 0 14px 20px 10px #0008;
+  --horn-shadow-down: 0 0 0 10px #e7c430, 0 0 0 12px #2c2f20, 0 3px 0 12px #2c2f20, 0 6px 10px 10px #0008;
+  --horn-on: radial-gradient(circle at 40% 30%, #ff7a6a, #d81e12 55%, #8a0c06);
+  --seg-bg: #2f3324; --seg-on: #e9d48a; --seg-on-ink: #2a2610;
+  --accent: #e7c430;
+  font-family: "Courier New", ui-monospace, monospace;
+}
+body[data-skin="retro"] .screw { display: block; }
+body[data-skin="retro"] .plate {
+  align-self: center; padding: 6px 18px; border-radius: 3px;
+  background: linear-gradient(#e6e1c8, #b9b49a); box-shadow: inset 0 1px 0 #fff, 0 2px 0 #2c2f20;
+}
+body[data-skin="retro"] .plate-sub { color: #2a2a1c; opacity: .8; }
+/* тумблер */
+body[data-skin="retro"] .key.mode { min-height: 92px; padding-top: 14px; justify-content: flex-start; }
+body[data-skin="retro"] .key.mode .led { top: 6px; left: auto; right: 10px; width: 10px; height: 10px; }
+body[data-skin="retro"] .key .lever {
+  display: block; position: relative; width: 26px; height: 40px; margin-bottom: 4px; border-radius: 13px;
+  background: radial-gradient(circle, #222 30%, #9a9a9a 32%, #d8d8d8 60%, #777);
+  box-shadow: 0 2px 4px #0008;
+}
+body[data-skin="retro"] .key .lever::after {
+  content: ""; position: absolute; left: 9px; width: 8px; height: 24px; border-radius: 4px;
+  top: 18px; background: linear-gradient(90deg, #888, #fff 45%, #999);
+  box-shadow: 0 2px 2px #0008; transition: top .08s;
+}
+body[data-skin="retro"] .key.active .lever::after { top: -2px; }
+body[data-skin="retro"] .key.mode:active { transform: none; }
+body[data-skin="retro"] .holds .key {
+  background: linear-gradient(#3d4130, #2a2d20); border-radius: 4px;
+  box-shadow: inset 0 1px 0 #6b7051, 0 3px 0 #1a1c13;
+}
+body[data-skin="retro"] .key.horn {
+  width: 150px; height: 150px; min-height: 0; align-self: center; margin: 14px 0 18px;
+}
+body[data-skin="retro"] .key.horn b { font-size: 26px; text-shadow: 0 2px 0 #7a0904; }
