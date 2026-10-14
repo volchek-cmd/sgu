@@ -19,7 +19,7 @@
     <header class="top">
       <div class="skins" role="tablist" aria-label="Вид пульта">
         <button data-skin="classic" class="skin-btn">Классик</button>
-        <button data-skin="neon" class="skin-btn">Неон</button>
+        <button data-skin="membrane" class="skin-btn">Мембрана</button>
         <button data-skin="retro" class="skin-btn">Ретро</button>
       </div>
     </header>
@@ -64,12 +64,13 @@
 
       <section class="holds">
         <button class="key hold manual" data-hold="manual"><span class="led"></span><b>РУЧНОЙ</b><small>MANUAL</small></button>
+        <button class="key toggle" id="btnLights"><span class="led"></span><b>МИГАЛКА</b><small>LIGHTS</small></button>
         <button class="key hold off" id="btnOff"><span class="led"></span><b>СТОП</b><small>OFF</small></button>
       </section>
 
-      <button class="key hold horn" data-hold="horn" aria-label="Кряк — держите">
+      <button class="key hold horn" data-hold="horn" aria-label="Кряк — звучит, пока нажата">
         <span class="horn-ring"></span>
-        <b>КРЯК</b><small>держи</small>
+        <b>КРЯК</b>
       </button>
 
       <div class="horn-style" role="radiogroup" aria-label="Тип кряка">

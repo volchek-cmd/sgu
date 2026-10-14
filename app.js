@@ -23,7 +23,9 @@ function render() {
   $('[data-hold="manual"]').classList.toggle('pressed', ui.manual);
   $$('[data-style]').forEach((b) => b.classList.toggle('active', b.dataset.style === ui.hornStyle));
   const live = ui.mode !== 'off' || ui.horn || ui.manual;
-  $('#lightbar').classList.toggle('on', live);
+  $('#lightbar').classList.toggle('on', live && ui.lights);
+  $('#lightbar').classList.toggle('disabled', !ui.lights);
+  $('#btnLights').classList.toggle('active', ui.lights);
   document.body.classList.toggle('live', live);
   let name = MODE_NAMES[ui.mode];
   if (ui.manual) name = 'РУЧНОЙ';
@@ -47,8 +49,19 @@ $('#btnOff').addEventListener('pointerdown', (e) => {
   e.preventDefault();
   engine.unlock();
   ui.mode = 'off';
-  engine.set({ mode: 'off' });
+  releaseManual();
+  engine.set({ mode: 'off', stop: true });   // глушит и «выбег» ручного/механики
   buzz(30);
+  render();
+});
+
+// --- Мигалка: визуально включается/выключается, звук не трогает
+ui.lights = store.get('lights', '1') === '1';
+$('#btnLights').addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  ui.lights = !ui.lights;
+  store.set('lights', ui.lights ? '1' : '0');
+  buzz(10);
   render();
 });
 
@@ -119,6 +132,7 @@ vol.addEventListener('input', () => {
 
 // --- Скины
 function setSkin(s) {
+  if (!['classic', 'membrane', 'retro'].includes(s)) s = 'classic';
   document.body.dataset.skin = s;
   $$('.skin-btn').forEach((b) => b.classList.toggle('active', b.dataset.skin === s));
   store.set('skin', s);

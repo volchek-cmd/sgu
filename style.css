@@ -94,7 +94,8 @@ body.live .d-pwr { opacity: 1; color: #ff3b3b; text-shadow: 0 0 8px #ff3b3b; }
 .key .lever { display: none; }
 
 .modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.holds { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.holds { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.lightbar.disabled { opacity: .35; filter: grayscale(1); }
 .holds .key { min-height: 54px; }
 
 .key.horn {
@@ -140,33 +141,33 @@ body[data-skin="classic"] {
   --accent: #ff9a1f;
 }
 
-/* ===== Скин 2: НЕОН — глянцевая сенсорная панель с подсветкой ===== */
-body[data-skin="neon"] {
-  --bg: radial-gradient(circle at 50% -10%, #12233d, #04070d 65%);
-  --ink: #d8ecff;
-  --chip: #0d1726; --chip-ink: #7fa6cc; --chip-on: #29d3ff; --chip-on-ink: #001520;
-  --panel: linear-gradient(180deg, #0b121e, #05080f);
-  --panel-r: 28px;
-  --panel-shadow: 0 0 0 1px #1d2c44, 0 0 40px #0b2a5544, inset 0 1px 0 #ffffff14;
-  --plate-ink: #29d3ff;
-  --disp-bg: linear-gradient(180deg, #0b3a6b, #062140); --disp-ink: #e6f6ff; --disp-glow: #29d3ffaa; --disp-r: 14px;
-  --disp-shadow: inset 0 0 0 1px #2a6db0, inset 0 8px 20px #ffffff10, 0 0 24px #1a6dff33;
-  --meter-bg: #04172c; --meter: linear-gradient(90deg, #29d3ff, #b84dff);
-  --key: #0b1424; --key-ink: #8fb8e0; --key-r: 14px;
-  --key-shadow: 0 0 0 1px #1d3352, inset 0 1px 0 #ffffff10;
-  --key-shadow-down: 0 0 0 1px #29d3ff, 0 0 14px #29d3ff66;
-  --key-on: radial-gradient(circle at 50% 120%, #1a7dff66, #0b1424 70%); --key-on-ink: #fff;
-  --led: #29d3ff; --led-off: #13243a;
-  --horn: radial-gradient(circle at 50% 30%, #3a0a4a, #14051c); --horn-ink: #ff6bf0; --horn-r: 24px;
-  --horn-shadow: 0 0 0 1px #6b1d82, 0 0 24px #b84dff33;
-  --horn-shadow-down: 0 0 0 2px #ff6bf0, 0 0 40px #ff3be0aa, inset 0 0 30px #ff3be055;
-  --horn-on: radial-gradient(circle at 50% 30%, #7a1290, #2a0636);
-  --seg-bg: #08101c; --seg-on: #29d3ff; --seg-on-ink: #001520;
-  --accent: #29d3ff;
+/* ===== Скин 2: МЕМБРАНА — светлый пульт с плёночной клавиатурой и ЖК‑экраном ===== */
+body[data-skin="membrane"] {
+  --bg: linear-gradient(180deg, #c9ced2, #9aa1a7);
+  --ink: #1d2733;
+  --chip: #e4e7ea; --chip-ink: #4a5561; --chip-on: #1f4e8c; --chip-on-ink: #fff;
+  --panel: linear-gradient(180deg, #f1f3f4, #d8dcdf);
+  --panel-r: 22px;
+  --panel-shadow: inset 0 1px 0 #fff, 0 0 0 1px #9aa1a7, 0 12px 26px #0005;
+  --plate-ink: #1f4e8c;
+  --disp-bg: linear-gradient(180deg, #b4c0a4, #9fac8f); --disp-ink: #1b2416; --disp-glow: transparent; --disp-r: 6px;
+  --disp-shadow: inset 0 2px 6px #0004, 0 0 0 2px #7b8590, 0 0 0 4px #e9ecee;
+  --meter-bg: #8e9b80; --meter: #1b2416;
+  --key: linear-gradient(180deg, #ffffff, #e6e9ec); --key-ink: #1d2733; --key-r: 12px;
+  --key-shadow: 0 0 0 1px #b3bac0, 0 2px 0 #b3bac0, 0 3px 6px #0002;
+  --key-shadow-down: 0 0 0 1px #8d959c, inset 0 2px 4px #0003;
+  --key-on: linear-gradient(180deg, #dfeafa, #c6d8f0); --key-on-ink: #0f3a73;
+  --led: #e0261b; --led-off: #cdbdbb;
+  --horn: linear-gradient(180deg, #e8261d, #b4150e); --horn-ink: #fff; --horn-r: 18px;
+  --horn-shadow: 0 0 0 1px #8a0f09, 0 4px 0 #8a0f09, 0 8px 14px #0004;
+  --horn-shadow-down: 0 0 0 1px #8a0f09, 0 1px 0 #8a0f09, inset 0 2px 6px #0004;
+  --horn-on: linear-gradient(180deg, #ff3a30, #c81a12);
+  --seg-bg: #d3d7db; --seg-on: #1f4e8c; --seg-on-ink: #fff;
+  --accent: #1f4e8c;
 }
-body[data-skin="neon"] .key.active { box-shadow: 0 0 0 1px #29d3ff, 0 0 18px #29d3ff55; }
-body[data-skin="neon"] .key .led { top: auto; bottom: 7px; left: 50%; width: 22px; height: 3px; border-radius: 2px; transform: translateX(-50%); }
-body[data-skin="neon"] .key.horn b { text-shadow: 0 0 14px #ff3be0; }
+body[data-skin="membrane"] .plate { border-bottom: 3px solid #1f4e8c; padding-bottom: 6px; }
+body[data-skin="membrane"] .d-mode, body[data-skin="membrane"] .d-freq { font-family: "Courier New", ui-monospace, monospace; }
+body[data-skin="membrane"] .foot { color: #1d2733; }
 
 /* ===== Скин 3: РЕТРО — металлический ящик, тумблеры и «грибок» ===== */
 body[data-skin="retro"] {

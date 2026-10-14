@@ -7,7 +7,7 @@ class SirenGen {
     this.sr = sr; this.dt = 1 / sr;
     this.mode = 'off'; this.modeT = 0; this.ph = 0; this.env = 0; this.sf = 0;
     this.horn = false; this.hornStyle = 'kryak'; this.hT = 0; this.hEnv = 0; this.gate = 1; this.hf = 0;
-    this.hp1 = 0; this.hp2 = 0; this.amp = 0;
+    this.hp1 = 0; this.hp2 = 0; this.hp3 = 0; this.amp = 0; this.vib = 0; this.kill = false;
     this.manual = false; this.man = 0; this.manPh = 0; this.manF = 0;
     this.rpm = 0; this.mp = 0; this.mf = 0;
     this.dispF = 0; this.level = 0; this.seed = 22222; this.drift = 0; this.jit = 0;
@@ -21,6 +21,7 @@ class SirenGen {
     if (m.hornStyle !== undefined) this.hornStyle = m.hornStyle;
     if (m.manual !== undefined) this.manual = m.manual;
     if (m.profile !== undefined) this.p = m.profile;
+    if (m.stop) this.kill = true;   // СТОП: глушим и «выбег» ручного/механики
   }
 
   // PolyBLEP — убирает алиасинг у прямоугольника и пилы
@@ -66,13 +67,21 @@ class SirenGen {
     const kRel = 1 - Math.exp(-1 / (0.03 * sr));
     const kGate = 1 - Math.exp(-1 / (0.006 * sr));
     const kSlew = 1 - Math.exp(-1 / (0.003 * sr));
+    const kAirAtt = 1 - Math.exp(-1 / (0.045 * sr));
+    const kAirRel = 1 - Math.exp(-1 / (0.09 * sr));
     const tonal = this.mode !== 'off' && this.mode !== 'mech';
     let peak = 0;
 
     for (let i = 0; i < n; i++) {
+      if (this.kill) {
+        // быстрое (~5 мс) затухание без щелчка
+        this.man *= 0.996; this.rpm *= 0.996;
+        if (this.man < 0.004 && this.rpm < 0.003) { this.man = 0; this.rpm = 0; this.kill = false; }
+      }
+
       // --- MANUAL: электронный тон разгоняется, пока кнопка зажата, и «выбегает» вниз
       //     после отпускания (как Peak‑and‑Hold / Coast Down у PA300 и MANUAL у «Элины»)
-      this.man += ((this.manual ? 1 : 0) - this.man) * (dt / (this.manual ? 1.1 : 2.2));
+      if (!this.kill) this.man += ((this.manual ? 1 : 0) - this.man) * (dt / (this.manual ? 1.1 : 2.2));
       let mn = 0;
       if (this.man > 0.004) {
         const f = this.p.hi * Math.sqrt(this.man);
@@ -102,7 +111,7 @@ class SirenGen {
       // --- механическая сирена СО‑120: ротор раскручивается и выбегает
       const spin = this.mode === 'mech' && !this.horn;
       const tau = spin ? 3.0 : 4.5;
-      this.rpm += ((spin ? 1 : 0) - this.rpm) * (dt / tau);
+      if (!this.kill) this.rpm += ((spin ? 1 : 0) - this.rpm) * (dt / tau);
       let m = 0;
       if (this.rpm > 0.003) {
         const mf = 90 + 1050 * this.rpm;
@@ -114,18 +123,25 @@ class SirenGen {
       }
 
       // --- кряк / гудок: звучит ровно пока кнопка зажата
-      this.hEnv += ((this.horn ? 1 : 0) - this.hEnv) * (this.horn ? kAtt : kRel);
+      const air = this.hornStyle === 'air';   // пневматика нарастает и стихает медленнее электроники
+      this.hEnv += ((this.horn ? 1 : 0) - this.hEnv) * (this.horn ? (air ? kAirAtt : kAtt) : (air ? kAirRel : kRel));
       let h = 0;
       if (this.hEnv > 0.0005) {
         const t = this.hT; this.hT += dt;
         if (this.hornStyle === 'air') {
-          // пневмогудок: два тона аккордом с лёгким «подъездом» по высоте
-          const bend = 1 + 0.06 * Math.exp(-t / 0.06);
-          const f1 = 311 * bend, f2 = 392 * bend;
-          const i1 = f1 * dt, i2 = f2 * dt;
-          this.hp1 = (this.hp1 + i1) % 1; this.hp2 = (this.hp2 + i2) % 1;
-          this.amp = (this.amp + 28 * dt) % 1;
-          h = (0.55 * this.sq(this.hp1, i1) + 0.5 * this.sq(this.hp2, i2)) * (0.85 + 0.15 * Math.sin(6.2832 * this.amp));
+          // Пневмосигнал: три рожка аккордом (до‑диез, фа, соль‑диез). Мембрана рожка
+          // хлопает узкими импульсами давления — отсюда «медный» тембр. Высота зависит
+          // от давления: при нажатии тон «подъезжает» снизу, при отпускании проседает.
+          const bend = 0.86 + 0.14 * Math.pow(this.hEnv, 0.6);
+          this.vib += (this.noise() * 0.006 - this.vib) * 0.0008;
+          const k = bend * (1 + this.vib);
+          const f1 = 277 * k, f2 = 349.5 * k * 1.002, f3 = 415 * k * 0.998;
+          const i1 = f1 * dt, i2 = f2 * dt, i3 = f3 * dt;
+          this.hp1 = (this.hp1 + i1) % 1; this.hp2 = (this.hp2 + i2) % 1; this.hp3 = (this.hp3 + i3) % 1;
+          const pl = (ph, inc, d) => this.saw(ph, inc) - this.saw((ph + d) % 1, inc);
+          h = 0.45 * pl(this.hp1, i1, 0.18) + 0.4 * pl(this.hp2, i2, 0.16) + 0.35 * pl(this.hp3, i3, 0.2);
+          // шипение воздуха: сильное в момент открытия клапана, потом фоном
+          h += this.noise() * (0.25 * Math.exp(-t / 0.07) + 0.04);
           this.hf = f1;
         } else {
           // «кряк» ДПС (Air Horn): низкий монотонный рык ~78 Гц из несимметричных
