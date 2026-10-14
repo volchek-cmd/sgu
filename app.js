@@ -119,11 +119,11 @@ function setAcoustic(a) {
   store.set('acou', a);
 }
 $$('[data-acou]').forEach((b) => b.addEventListener('click', () => setAcoustic(b.dataset.acou)));
-setAcoustic(store.get('acou', 'street'));
+setAcoustic(store.get('acou', 'near'));
 
 // --- Громкость
 const vol = $('#vol');
-vol.value = store.get('vol', '80');
+vol.value = store.get('vol', '100');
 engine.setVolume(vol.value / 100);
 vol.addEventListener('input', () => {
   engine.setVolume(vol.value / 100);

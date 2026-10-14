@@ -217,13 +217,15 @@ const PROFILES = {
 };
 
 class SirenEngine {
+  static MAKEUP = 4.5;   // ≈ +13 дБ после компрессора
+
   constructor() {
     this.ctx = null;
     this.state = { mode: 'off', horn: false, manual: false, hornStyle: 'kryak' };
     this.send = null;
     this.freq = 0;
     this.level = 0;
-    this.volume = 0.8;
+    this.volume = 1;
   }
 
   // Вызывать синхронно внутри обработчика нажатия — иначе iOS не даст звук
@@ -302,11 +304,22 @@ class SirenEngine {
     this.air.connect(this.dry);
     this.air.connect(verb); verb.connect(this.wet);
 
+    // 6. Максимайзер громкости: плотное сжатие + подъём уровня + мягкий ограничитель.
+    //    Сигнал доводится почти до 0 дБFS постоянно — так телефон звучит на пределе
+    //    своих возможностей (как перегруженный усилитель СГУ), без цифрового треска.
     const comp = ctx.createDynamicsCompressor();
-    comp.threshold.value = -12; comp.ratio.value = 5; comp.attack.value = 0.003; comp.release.value = 0.15;
-    this.gain = ctx.createGain(); this.gain.gain.value = this.volume;
+    comp.threshold.value = -28; comp.knee.value = 4; comp.ratio.value = 14;
+    comp.attack.value = 0.002; comp.release.value = 0.12;
+    this.gain = ctx.createGain(); this.gain.gain.value = this.volume * SirenEngine.MAKEUP;
+    const limiter = ctx.createWaveShaper();
+    const lc = new Float32Array(4096);
+    for (let i = 0; i < lc.length; i++) {
+      const x = (i / (lc.length - 1)) * 2 - 1;
+      lc[i] = Math.tanh(1.6 * x) / Math.tanh(1.6) * 0.98;
+    }
+    limiter.curve = lc; limiter.oversample = '4x';
     this.dry.connect(comp); this.wet.connect(comp);
-    comp.connect(this.gain); this.gain.connect(ctx.destination);
+    comp.connect(this.gain); this.gain.connect(limiter); limiter.connect(ctx.destination);
     this.input = driver[0];
     this.setAcoustic(this.acoustic || 'street');
 
@@ -388,7 +401,7 @@ class SirenEngine {
 
   setVolume(v) {
     this.volume = v;
-    if (this.gain) this.gain.gain.setTargetAtTime(v, this.ctx.currentTime, 0.02);
+    if (this.gain) this.gain.gain.setTargetAtTime(v * SirenEngine.MAKEUP, this.ctx.currentTime, 0.02);
   }
 
   suspend() { if (this.ctx && this.ctx.state === 'running') this.ctx.suspend(); }
